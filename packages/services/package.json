@@ -19,14 +19,14 @@
     "@todo/config-eslint": "*",
     "@todo/config-jest": "*",
     "@todo/config-ts": "*",
-    "eslint": "^8.55.0",
-    "jest": "^29.7.0",
+    "eslint": "^9.31.0",
+    "jest": "^30.0.4",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "axios": "^1.6.2",
-    "date-fns": "^2.30.0",
-    "zod": "^3.22.4"
+    "date-fns": "^4.1.0",
+    "zod": "^4.0.5"
   }
 }
