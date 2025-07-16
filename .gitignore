@@ -1,0 +1,78 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+.nyc_output
+playwright-report
+test-results
+
+# Build outputs
+dist
+build
+.next
+out
+.turbo
+storybook-static
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+.history/
+
+# Cache
+.eslintcache
+.cache
+tsconfig.tsbuildinfo
+
+# Misc
+*.pem
+
+# React Native / Expo
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Hardhat / Blockchain
+artifacts/
+cache/
+typechain/
+typechain-types/
+
+# Deployment
+.vercel
+.netlify
+
+# Documentation
+.docusaurus

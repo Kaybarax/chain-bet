@@ -1,0 +1,19 @@
+{
+  "name": "@todo/config-ts",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "base.json",
+    "react.json",
+    "nextjs.json",
+    "react-native.json",
+    "node.json"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  }
+}

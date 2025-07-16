@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  mongodb-test:
+    image: mongo:latest
+    container_name: mongodb-test
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    networks:
+      - test-network
+    tmpfs:
+      - /data/db
+
+  elasticsearch-test:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    container_name: elasticsearch-test
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9201:9200"
+    networks:
+      - test-network
+    tmpfs:
+      - /usr/share/elasticsearch/data
+
+  redis-test:
+    image: redis:alpine
+    container_name: redis-test
+    ports:
+      - "6380:6379"
+    networks:
+      - test-network
+    tmpfs:
+      - /data
+
+  # Test runners
+  api-test:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile.test
+    volumes:
+      - ./apps/api:/app
+      - ./packages:/packages
+      - /app/node_modules
+    depends_on:
+      - mongodb-test
+      - redis-test
+    environment:
+      - NODE_ENV=test
+      - MONGODB_URI=mongodb://root:password@mongodb-test:27017/todos_test?authSource=admin
+      - REDIS_URI=redis://redis-test:6379
+    networks:
+      - test-network
+    command: npm test
+
+  web-test:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile.test
+    volumes:
+      - ./apps/web:/app
+      - ./packages:/packages
+      - /app/node_modules
+    environment:
+      - NODE_ENV=test
+    networks:
+      - test-network
+    command: npm test
+
+  e2e-test:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.playwright
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      - api-test
+      - web-test
+    environment:
+      - NODE_ENV=test
+      - API_URL=http://api-test:3000
+      - WEB_URL=http://web-test:5173
+    networks:
+      - test-network
+    command: npx playwright test
+
+networks:
+  test-network:
+    driver: bridge

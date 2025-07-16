@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  mongodb:
+    extends:
+      file: docker-compose.yml
+      service: mongodb
+    profiles: ["db", "api", "ingestion"]
+
+  elasticsearch:
+    extends:
+      file: docker-compose.yml
+      service: elasticsearch
+    profiles: ["db", "ingestion", "search"]
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+    profiles: ["db", "api", "cache"]
+
+  # Seed data service
+  seed-data:
+    build:
+      context: .
+      dockerfile: ./db/Dockerfile.seed
+    volumes:
+      - ./db:/app/db
+    depends_on:
+      - mongodb
+    command: node /app/db/seed-todos.js
+    profiles: ["seed"]
+    networks:
+      - app-network
+
+  # Development services
+  api-dev:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile.dev
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://root:password@mongodb:27017/todos?authSource=admin
+      - REDIS_URI=redis://redis:6379
+    profiles: ["api"]
+    networks:
+      - app-network
+
+  web-dev:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile.dev
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://api-dev:3000
+    profiles: ["web"]
+    networks:
+      - app-network
+
+  ingestion-dev:
+    build:
+      context: .
+      dockerfile: ./apps/ingestion/Dockerfile.dev
+    volumes:
+      - ./apps/ingestion:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+      - elasticsearch
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://root:password@mongodb:27017/todos?authSource=admin
+      - ELASTICSEARCH_URI=http://elasticsearch:9200
+    profiles: ["ingestion"]
+    networks:
+      - app-network
+
+  # Observability services
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    profiles: ["metrics", "observability"]
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    profiles: ["metrics", "observability"]
+    networks:
+      - app-network
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./infra/otel-collector/otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8888:8888"   # Metrics
+      - "8889:8889"   # Prometheus exporter
+    profiles: ["tracing", "observability"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:

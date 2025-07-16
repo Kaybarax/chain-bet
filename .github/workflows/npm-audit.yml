@@ -1,0 +1,49 @@
+name: NPM Audit Fix
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run every day at midnight
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  audit-fix:
+    name: Run npm audit fix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit fix
+        run: npm audit fix --ignore-workspace-root-check || true
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.git-check.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "fix: security vulnerabilities from npm audit fix"
+          title: "fix: security vulnerabilities from npm audit fix"
+          body: |
+            This PR fixes security vulnerabilities in dependencies using `npm audit fix`.
+
+            Changes were made automatically by the npm-audit-fix GitHub Action.
+          branch: npm-audit-fix
+          base: main
+          labels: security,dependencies
+          delete-branch: true

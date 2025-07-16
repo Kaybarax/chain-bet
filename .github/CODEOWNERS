@@ -1,0 +1,42 @@
+# This file defines who is responsible for code in the repository
+# Each line is a file pattern followed by one or more owners
+# Order is important; the last matching pattern takes precedence
+
+# Default owners for everything in the repo
+* @project-lead
+
+# Apps
+/apps/web/ @web-team
+/apps/mobile/ @mobile-team
+/apps/api/ @backend-team
+/apps/ingestion/ @data-team
+/apps/contracts/ @blockchain-team
+
+# Packages
+/packages/ui-web/ @ui-team
+/packages/ui-mobile/ @ui-team
+/packages/services/ @backend-team
+/packages/config-eslint/ @tooling-team
+/packages/config-ts/ @tooling-team
+/packages/config-jest/ @tooling-team
+/packages/config-release/ @devops-team
+
+# Infrastructure
+/infra/ @devops-team
+/docker-compose*.yml @devops-team
+/.github/workflows/ @devops-team
+
+# Database
+/db/ @data-team
+
+# Documentation
+/docs/ @docs-team
+/*.md @docs-team
+
+# Configuration files
+/turbo.json @tooling-team
+/tsconfig.json @tooling-team
+/.eslintrc.js @tooling-team
+/.prettierrc @tooling-team
+/.commitlintrc.cjs @tooling-team
+/.lintstagedrc.cjs @tooling-team

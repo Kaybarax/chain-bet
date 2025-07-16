@@ -1,0 +1,84 @@
+name: Chromatic Visual Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/ui-web/**'
+      - 'packages/ui-mobile/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/ui-web/**'
+      - 'packages/ui-mobile/**'
+
+jobs:
+  chromatic-ui-web:
+    name: Chromatic UI Web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ui-web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required for Chromatic to track changes correctly
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN_UI_WEB }}
+          workingDir: packages/ui-web
+          storybookBuildDir: storybook-static
+          exitZeroOnChanges: true # Optional: Allow the workflow to pass even if there are UI changes
+          autoAcceptChanges: ${{ github.ref == 'refs/heads/main' }} # Auto-accept changes on main branch
+
+  chromatic-ui-mobile:
+    name: Chromatic UI Mobile
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ui-mobile
+    # Only run if the ui-mobile package exists and has a Storybook configuration
+    if: ${{ hashFiles('packages/ui-mobile/package.json') != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required for Chromatic to track changes correctly
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN_UI_MOBILE }}
+          workingDir: packages/ui-mobile
+          storybookBuildDir: storybook-static
+          exitZeroOnChanges: true # Optional: Allow the workflow to pass even if there are UI changes
+          autoAcceptChanges: ${{ github.ref == 'refs/heads/main' }} # Auto-accept changes on main branch

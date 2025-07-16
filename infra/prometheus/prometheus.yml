@@ -1,0 +1,49 @@
+# Global config
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing endpoints to scrape
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Scrape API service metrics
+  - job_name: "api"
+    static_configs:
+      - targets: ["api-dev:3000"]
+    metrics_path: /api/metrics
+
+  # Scrape OpenTelemetry Collector metrics
+  - job_name: "otel-collector"
+    static_configs:
+      - targets: ["otel-collector:8889"]
+
+  # Scrape Node Exporter metrics (system metrics)
+  - job_name: "node"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # Scrape Redis metrics
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+
+  # Scrape MongoDB metrics
+  - job_name: "mongodb"
+    static_configs:
+      - targets: ["mongodb-exporter:9216"]

@@ -1,0 +1,59 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 1000
+    spike_limit_mib: 200
+  resource:
+    attributes:
+      - key: service.name
+        action: upsert
+        value: "todo-monorepo"
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: otel
+    send_timestamps: true
+    metric_expiration: 180m
+    resource_to_telemetry_conversion:
+      enabled: true
+  logging:
+    loglevel: debug
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+  elasticsearch:
+    endpoints: ["http://elasticsearch:9200"]
+    index: traces
+    mapping:
+      mode: ecs
+    flush:
+      bytes: 10485760 # 10 MiB
+      interval: 30s
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [logging, otlp, elasticsearch]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [logging, prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch, resource]
+      exporters: [logging, elasticsearch]
