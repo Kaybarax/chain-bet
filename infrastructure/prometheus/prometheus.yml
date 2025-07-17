@@ -1,0 +1,65 @@
+# Global configuration for Prometheus
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rule files
+rule_files: []
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Web application metrics
+  - job_name: 'web-app'
+    static_configs:
+      - targets: ['web:3000']
+    metrics_path: '/api/metrics'
+    scrape_interval: 30s
+
+  # API server metrics
+  - job_name: 'api-server'
+    static_configs:
+      - targets: ['api:3001']
+    metrics_path: '/api/metrics'
+    scrape_interval: 30s
+
+  # Ingestion worker metrics
+  - job_name: 'ingestion-worker'
+    static_configs:
+      - targets: ['ingestion:3002']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # MongoDB metrics (if using mongodb_exporter)
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+    scrape_interval: 30s
+
+  # Redis metrics (if using redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # Elasticsearch metrics (if using elasticsearch_exporter)
+  - job_name: 'elasticsearch'
+    static_configs:
+      - targets: ['elasticsearch-exporter:9114']
+    scrape_interval: 30s
+
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s

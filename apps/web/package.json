@@ -1,0 +1,58 @@
+{
+  "name": "@chainbet/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build"
+  },
+  "dependencies": {
+    "next": "^14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@ui-web/components": "workspace:*",
+    "@services/api": "workspace:*",
+    "@services/auth": "workspace:*",
+    "@services/database": "workspace:*",
+    "mongodb": "^6.3.0",
+    "redis": "^4.6.12",
+    "@elastic/elasticsearch": "^8.11.0",
+    "pino": "^8.17.2",
+    "zod": "^3.22.4",
+    "tailwindcss": "^3.4.0",
+    "framer-motion": "^10.16.16",
+    "lucide-react": "^0.303.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "typescript": "^5.3.3",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.0.4",
+    "@config/eslint": "workspace:*",
+    "@config/typescript": "workspace:*",
+    "@config/jest": "workspace:*",
+    "@playwright/test": "^1.40.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.1.6",
+    "@storybook/react": "^7.6.6",
+    "@storybook/addon-essentials": "^7.6.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32"
+  },
+  "eslintConfig": {
+    "extends": ["@config/eslint"]
+  }
+}

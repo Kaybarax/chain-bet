@@ -1,0 +1,23 @@
+{
+  "extends": "../../packages/config/typescript/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@lib/*": ["../../packages/lib/*"],
+      "@config/*": ["../../packages/config/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

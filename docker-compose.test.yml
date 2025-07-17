@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  # Test Database Services
+  mongodb-test:
+    image: mongo:7.0
+    container_name: chainbet-mongodb-test
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: chainbet_test
+    tmpfs:
+      - /data/db
+    networks:
+      - chainbet-test-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  redis-test:
+    image: redis:7.2-alpine
+    container_name: chainbet-redis-test
+    ports:
+      - "6379:6379"
+    tmpfs:
+      - /data
+    networks:
+      - chainbet-test-network
+    command: redis-server --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  elasticsearch-test:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: chainbet-elasticsearch-test
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    ports:
+      - "9200:9200"
+    tmpfs:
+      - /usr/share/elasticsearch/data
+    networks:
+      - chainbet-test-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Test Runner Services
+  unit-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: test
+    container_name: chainbet-unit-tests
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=mongodb://admin:password@mongodb-test:27017/chainbet_test?authSource=admin
+      - REDIS_URL=redis://redis-test:6379
+      - ELASTICSEARCH_URL=http://elasticsearch-test:9200
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./coverage:/app/coverage
+    depends_on:
+      mongodb-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      elasticsearch-test:
+        condition: service_healthy
+    networks:
+      - chainbet-test-network
+    command: pnpm test --coverage
+
+  integration-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: test
+    container_name: chainbet-integration-tests
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=mongodb://admin:password@mongodb-test:27017/chainbet_test?authSource=admin
+      - REDIS_URL=redis://redis-test:6379
+      - ELASTICSEARCH_URL=http://elasticsearch-test:9200
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./test-results:/app/test-results
+    depends_on:
+      mongodb-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      elasticsearch-test:
+        condition: service_healthy
+    networks:
+      - chainbet-test-network
+    command: pnpm test:integration
+
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      target: e2e
+    container_name: chainbet-e2e-tests
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=mongodb://admin:password@mongodb-test:27017/chainbet_test?authSource=admin
+      - REDIS_URL=redis://redis-test:6379
+      - ELASTICSEARCH_URL=http://elasticsearch-test:9200
+      - PLAYWRIGHT_HEADLESS=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+    depends_on:
+      mongodb-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      elasticsearch-test:
+        condition: service_healthy
+    networks:
+      - chainbet-test-network
+    command: pnpm test:e2e
+
+  # Contract Tests
+  contract-tests:
+    build:
+      context: .
+      dockerfile: apps/contracts/Dockerfile
+      target: test
+    container_name: chainbet-contract-tests
+    environment:
+      - NODE_ENV=test
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./coverage:/app/coverage
+    networks:
+      - chainbet-test-network
+    command: pnpm test --filter=contracts
+
+networks:
+  chainbet-test-network:
+    driver: bridge

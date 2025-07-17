@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Husky commit-msg hook
+
+echo "🔍 Checking commit message..."
+
+# Run commitlint
+pnpm exec commitlint --edit "$1"
+
+if [ $? -eq 0 ]; then
+  echo "✅ Commit message is valid!"
+else
+  echo "❌ Commit message is invalid!"
+  echo ""
+  echo "Please follow the conventional commit format:"
+  echo "  feat: add new feature"
+  echo "  fix: fix bug"
+  echo "  docs: update documentation"
+  echo "  style: format code"
+  echo "  refactor: refactor code"
+  echo "  test: add tests"
+  echo "  chore: update dependencies"
+  echo ""
+  echo "Example: feat(web): add user authentication"
+  exit 1
+fi

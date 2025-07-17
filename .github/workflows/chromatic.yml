@@ -1,0 +1,109 @@
+name: Chromatic
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/ui-web/**'
+      - 'packages/ui-mobile/**'
+      - 'apps/web/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+concurrency:
+  group: chromatic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic-deployment:
+    name: Chromatic Deployment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.0.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Turborepo cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Build Storybook
+        run: pnpm storybook:build
+        env:
+          NODE_ENV: production
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: storybook:build
+          exitZeroOnChanges: true
+          exitOnceUploaded: true
+          onlyChanged: true
+
+      - name: Deploy Storybook to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/ui-web/storybook-static
+          destination_dir: storybook
+
+      - name: Comment PR with Storybook link
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && comment.body.includes('Storybook')
+            );
+            
+            const body = `🎨 **Storybook Preview**
+            
+            View the updated component library:
+            - 📚 [Storybook](https://chainbet.github.io/storybook/)
+            - 🎯 [Chromatic](https://www.chromatic.com/builds?appId=${{ secrets.CHROMATIC_PROJECT_TOKEN }})
+            
+            Changes will be reflected once the build completes.`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }

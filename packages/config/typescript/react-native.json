@@ -1,0 +1,19 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "jsx": "react-native",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@ui-web/*": ["../../packages/ui-web/src/*"],
+      "@ui-mobile/*": ["../../packages/ui-mobile/src/*"],
+      "@services/*": ["../../packages/services/src/*"],
+      "@config/*": ["../../packages/config/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}

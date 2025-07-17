@@ -1,0 +1,196 @@
+version: '3.8'
+
+services:
+  # Database Services
+  mongodb:
+    image: mongo:7.0
+    profiles: ["database", "all"]
+    container_name: chainbet-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: chainbet
+    volumes:
+      - mongodb_data:/data/db
+      - ./db/seeds:/docker-entrypoint-initdb.d/seeds
+    networks:
+      - chainbet-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    profiles: ["cache", "all"]
+    container_name: chainbet-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - chainbet-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    profiles: ["search", "all"]
+    container_name: chainbet-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - chainbet-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Application Services
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: development
+    profiles: ["web", "all"]
+    container_name: chainbet-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mongodb://admin:password@mongodb:27017/chainbet?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
+      - NEXT_PUBLIC_CHAIN_ID=${NEXT_PUBLIC_CHAIN_ID}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - chainbet-network
+    command: pnpm dev --filter=web
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: development
+    profiles: ["api", "all"]
+    container_name: chainbet-api
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mongodb://admin:password@mongodb:27017/chainbet?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PRIVATE_KEY=${PRIVATE_KEY}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - chainbet-network
+    command: pnpm dev --filter=api
+
+  ingestion:
+    build:
+      context: .
+      dockerfile: apps/ingestion/Dockerfile
+      target: development
+    profiles: ["workers", "all"]
+    container_name: chainbet-ingestion
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=mongodb://admin:password@mongodb:27017/chainbet?authSource=admin
+      - REDIS_URL=redis://redis:6379
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - chainbet-network
+    command: pnpm dev --filter=ingestion
+
+  # Monitoring Services
+  prometheus:
+    image: prom/prometheus:latest
+    profiles: ["monitoring", "all"]
+    container_name: chainbet-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - chainbet-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    profiles: ["monitoring", "all"]
+    container_name: chainbet-grafana
+    ports:
+      - "3003:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - chainbet-network
+    depends_on:
+      - prometheus
+
+volumes:
+  mongodb_data:
+  redis_data:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  chainbet-network:
+    driver: bridge

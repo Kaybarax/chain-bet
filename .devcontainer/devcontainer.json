@@ -1,0 +1,124 @@
+{
+  "name": "ChainBet Development Environment",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "web",
+  "workspaceFolder": "/app",
+  "shutdownAction": "stopCompose",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18.18.0",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright",
+        "ms-vscode.test-adapter-converter",
+        "ms-vscode.js-debug",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-vscode.vscode-pull-request-github",
+        "eamodio.gitlens",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-todo-highlight",
+        "gruntfuggly.todo-tree",
+        "ms-vscode.vscode-thunder-client",
+        "humao.rest-client",
+        "ms-vscode.hexeditor",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-azuretools.vscode-cosmosdb",
+        "ms-vscode.vscode-node-azure-pack"
+      ],
+      "settings": {
+        "typescript.preferences.quoteStyle": "single",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "files.associations": {
+          "*.env.*": "dotenv"
+        },
+        "emmet.includeLanguages": {
+          "javascript": "javascriptreact",
+          "typescript": "typescriptreact"
+        },
+        "tailwindCSS.experimental.classRegex": [
+          "tw`([^`]*)",
+          "tw=\"([^\"]*)",
+          "tw={\"([^\"}]*)",
+          "tw\\.\\w+`([^`]*)",
+          "tw\\(.*?\\)`([^`]*)"
+        ]
+      }
+    }
+  },
+
+  "forwardPorts": [3000, 3001, 3002, 3003, 6379, 9200, 9090, 27017],
+  "portsAttributes": {
+    "3000": {
+      "label": "Web App",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "API Server",
+      "onAutoForward": "notify"
+    },
+    "3002": {
+      "label": "Storybook",
+      "onAutoForward": "notify"
+    },
+    "3003": {
+      "label": "Grafana",
+      "onAutoForward": "notify"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "silent"
+    },
+    "9200": {
+      "label": "Elasticsearch",
+      "onAutoForward": "silent"
+    },
+    "9090": {
+      "label": "Prometheus",
+      "onAutoForward": "silent"
+    },
+    "27017": {
+      "label": "MongoDB",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "pnpm install && pnpm build",
+  "postStartCommand": "pnpm db:migrate && pnpm db:seed",
+
+  "remoteUser": "node",
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "DATABASE_URL": "mongodb://admin:password@mongodb:27017/chainbet?authSource=admin",
+    "REDIS_URL": "redis://redis:6379",
+    "ELASTICSEARCH_URL": "http://elasticsearch:9200"
+  }
+}

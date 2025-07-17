@@ -1,0 +1,142 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "NODE_ENV",
+    "DATABASE_URL",
+    "MONGODB_URI",
+    "REDIS_URL",
+    "ELASTICSEARCH_URL",
+    "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
+    "NEXT_PUBLIC_CHAIN_ID",
+    "PRIVATE_KEY",
+    "ETHERSCAN_API_KEY",
+    "GEMINI_API_KEY",
+    "CHROMATIC_PROJECT_TOKEN",
+    "SENTRY_DSN"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**", "storybook-static/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
+        "NEXT_PUBLIC_CHAIN_ID",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
+        "NEXT_PUBLIC_CHAIN_ID",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": [".eslintcache"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"],
+      "outputs": [".eslintcache"]
+    },
+    "type-check": {
+      "dependsOn": ["^type-check"],
+      "outputs": ["tsconfig.tsbuildinfo"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL"
+      ]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL"
+      ]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL",
+        "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
+        "NEXT_PUBLIC_CHAIN_ID"
+      ]
+    },
+    "clean": {
+      "cache": false
+    },
+    "contracts:compile": {
+      "dependsOn": ["^contracts:compile"],
+      "outputs": ["artifacts/**", "cache/**", "typechain/**"]
+    },
+    "contracts:deploy": {
+      "dependsOn": ["contracts:compile"],
+      "env": [
+        "PRIVATE_KEY",
+        "ETHERSCAN_API_KEY",
+        "NEXT_PUBLIC_CHAIN_ID"
+      ]
+    },
+    "contracts:verify": {
+      "dependsOn": ["contracts:deploy"],
+      "env": [
+        "ETHERSCAN_API_KEY",
+        "NEXT_PUBLIC_CHAIN_ID"
+      ]
+    },
+    "storybook": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "CHROMATIC_PROJECT_TOKEN"
+      ]
+    },
+    "storybook:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"],
+      "env": [
+        "NODE_ENV",
+        "CHROMATIC_PROJECT_TOKEN"
+      ]
+    },
+    "docs:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "docs:build": {
+      "dependsOn": ["^docs:build"],
+      "outputs": ["build/**", ".docusaurus/**"]
+    }
+  },
+  "remoteCache": {
+    "enabled": true
+  }
+}

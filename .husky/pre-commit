@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Husky pre-commit hook
+
+echo "🚀 Running pre-commit hooks..."
+
+# Check if we're in a git repository
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  echo "Not in a git repository. Skipping pre-commit hooks."
+  exit 0
+fi
+
+# Run lint-staged
+pnpm exec lint-staged
+
+# Check if there are any staged files
+if ! git diff --cached --quiet; then
+  echo "✅ Pre-commit hooks completed successfully!"
+else
+  echo "⚠️  No staged files found."
+fi

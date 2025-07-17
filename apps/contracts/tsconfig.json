@@ -1,0 +1,22 @@
+{
+  "extends": "../../packages/config/typescript/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@lib/*": ["../../packages/lib/*"],
+      "@config/*": ["../../packages/config/*"]
+    }
+  },
+  "include": [
+    "contracts/**/*",
+    "scripts/**/*",
+    "test/**/*",
+    "typechain-types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "artifacts",
+    "cache"
+  ]
+}

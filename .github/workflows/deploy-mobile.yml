@@ -1,0 +1,101 @@
+name: Deploy Mobile
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+concurrency:
+  group: deploy-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-submit:
+    name: Build and Submit Mobile App
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.0.0
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Turborepo cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Build mobile app
+        run: pnpm build --filter=mobile
+        env:
+          NODE_ENV: production
+          EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.WALLETCONNECT_PROJECT_ID }}
+          EXPO_PUBLIC_CHAIN_ID: ${{ secrets.CHAIN_ID }}
+
+      - name: Create EAS build
+        run: |
+          cd apps/mobile
+          pnpm exec eas build --platform all --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Submit to App Store
+        run: |
+          cd apps/mobile
+          pnpm exec eas submit --platform ios --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_APPLE_ID: ${{ secrets.EXPO_APPLE_ID }}
+          EXPO_APPLE_ID_PASSWORD: ${{ secrets.EXPO_APPLE_ID_PASSWORD }}
+
+      - name: Submit to Google Play
+        run: |
+          cd apps/mobile
+          pnpm exec eas submit --platform android --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_ANDROID_SERVICE_ACCOUNT_KEY_PATH: ${{ secrets.EXPO_ANDROID_SERVICE_ACCOUNT_KEY_PATH }}
+
+      - name: Notify Slack on success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: 'Mobile app submission succeeded! 📱'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: 'Mobile app submission failed! ❌'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

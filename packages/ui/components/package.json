@@ -1,0 +1,80 @@
+{
+  "name": "@ui/components",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./button": {
+      "import": "./dist/button.mjs",
+      "require": "./dist/button.js",
+      "types": "./dist/button.d.ts"
+    },
+    "./card": {
+      "import": "./dist/card.mjs",
+      "require": "./dist/card.js",
+      "types": "./dist/card.d.ts"
+    },
+    "./input": {
+      "import": "./dist/input.mjs",
+      "require": "./dist/input.js",
+      "types": "./dist/input.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.0.2",
+    "@ui/utils": "workspace:*",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.303.0",
+    "react": "^18.2.0",
+    "tailwind-merge": "^2.2.0"
+  },
+  "devDependencies": {
+    "@config/eslint": "workspace:*",
+    "@config/jest": "workspace:*",
+    "@config/typescript": "workspace:*",
+    "@storybook/addon-essentials": "^7.6.6",
+    "@storybook/addon-interactions": "^7.6.6",
+    "@storybook/addon-links": "^7.6.6",
+    "@storybook/addon-onboarding": "^1.0.10",
+    "@storybook/blocks": "^7.6.6",
+    "@storybook/react": "^7.6.6",
+    "@storybook/react-vite": "^7.6.6",
+    "@storybook/test": "^7.6.6",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.6.6",
+    "tailwindcss": "^3.3.6",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

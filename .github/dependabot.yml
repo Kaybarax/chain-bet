@@ -1,0 +1,171 @@
+version: 2
+updates:
+  # Root package.json
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "security"
+
+  # Web app
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "web"
+
+  # Mobile app
+  - package-ecosystem: "npm"
+    directory: "/apps/mobile"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "mobile"
+
+  # API
+  - package-ecosystem: "npm"
+    directory: "/apps/api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "api"
+
+  # Contracts
+  - package-ecosystem: "npm"
+    directory: "/apps/contracts"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "contracts"
+
+  # UI Web package
+  - package-ecosystem: "npm"
+    directory: "/packages/ui-web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "ui"
+
+  # UI Mobile package
+  - package-ecosystem: "npm"
+    directory: "/packages/ui-mobile"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "ui"
+
+  # Services package
+  - package-ecosystem: "npm"
+    directory: "/packages/services"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "services"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    reviewers:
+      - "chainbet-team"
+    labels:
+      - "dependencies"
+      - "docker"

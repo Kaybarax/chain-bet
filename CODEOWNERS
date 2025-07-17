@@ -1,0 +1,47 @@
+# Owners and maintainers of the ChainBet monorepo
+
+# Global owners (required for all PRs)
+* @chainbet-admin @chainbet-lead
+
+# Core packages
+/packages/ @chainbet-core @chainbet-admin
+
+# Web application
+/apps/web/ @chainbet-frontend @chainbet-core
+/packages/ui-web/ @chainbet-frontend @chainbet-core
+
+# Mobile application
+/apps/mobile/ @chainbet-mobile @chainbet-core
+/packages/ui-mobile/ @chainbet-mobile @chainbet-core
+
+# API and backend services
+/apps/api/ @chainbet-backend @chainbet-core
+/apps/ingestion/ @chainbet-backend @chainbet-core
+/packages/services/ @chainbet-backend @chainbet-core
+
+# Smart contracts
+/apps/contracts/ @chainbet-blockchain @chainbet-core
+
+# Database and migrations
+/db/ @chainbet-backend @chainbet-devops
+
+# Infrastructure and DevOps
+/infrastructure/ @chainbet-devops @chainbet-admin
+/.github/ @chainbet-devops @chainbet-admin
+/docker-compose*.yml @chainbet-devops @chainbet-admin
+/Dockerfile* @chainbet-devops @chainbet-admin
+
+# Configuration files
+/packages/config/ @chainbet-core @chainbet-admin
+/turbo.json @chainbet-devops @chainbet-admin
+/package.json @chainbet-admin
+/pnpm-*.yaml @chainbet-admin
+
+# Documentation
+/docs/ @chainbet-admin @chainbet-core
+/README.md @chainbet-admin
+/CONTRIBUTING.md @chainbet-admin
+/SECURITY.md @chainbet-admin
+
+# Scripts
+/scripts/ @chainbet-devops @chainbet-backend

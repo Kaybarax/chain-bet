@@ -1,0 +1,33 @@
+# Test Dockerfile
+ARG NODE_VERSION=18.18.0
+ARG PNPM_VERSION=9.0.0
+
+FROM node:${NODE_VERSION}-alpine AS base
+ARG PNPM_VERSION
+RUN npm install -g pnpm@${PNPM_VERSION}
+RUN apk add --no-cache libc6-compat
+RUN apk update
+WORKDIR /app
+
+# Install dependencies including dev dependencies
+FROM base AS deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/*/package.json ./apps/*/
+COPY packages/*/package.json ./packages/*/
+COPY packages/config/*/package.json ./packages/config/*/
+RUN pnpm install --frozen-lockfile
+
+# Test runner
+FROM base AS test
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+CMD ["pnpm", "test"]
+
+# E2E test runner with Playwright
+FROM base AS e2e
+RUN apk add --no-cache chromium
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin/chromium
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+CMD ["pnpm", "test:e2e"]

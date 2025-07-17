@@ -1,0 +1,27 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@ui-web/*": ["../../packages/ui-web/src/*"],
+      "@ui-mobile/*": ["../../packages/ui-mobile/src/*"],
+      "@services/*": ["../../packages/services/src/*"],
+      "@config/*": ["../../packages/config/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ]
+}
