@@ -1,6 +1,10 @@
-# ChainBet - Decentralized Football Betting Platform
+# ChainBet: On-Chain Football Betting Platform
 
-> **A comprehensive monorepo for building decentralized betting applications with modern DevOps practices**
+ChainBet is a next-generation, decentralized football betting application built on blockchain technology. It offers a unique combination of features:
+
+- **Decentralized, Verifiable Betting**: Place bets directly through smart contracts on Polygon and Moonbeam blockchains
+- **AI-Driven Match Analysis**: Get intelligent insights and probability analysis powered by Google Gemini
+- **Cross-Platform Experience**: Seamless experience across web and mobile platforms
 
 ## 🚀 Quick Start
 
@@ -25,95 +29,56 @@ pnpm dev
 
 Visit [http://localhost:3000](http://localhost:3000) to see the web application.
 
-## 📁 Project Structure
+## 🎮 Key Features
 
-```
-├── apps/
-│   ├── web/                 # Next.js 14 web application
-│   ├── mobile/              # Expo React Native app
-│   ├── api/                 # Fastify Node.js API server
-│   └── contracts/           # Hardhat Ethereum contracts
-├── packages/
-│   ├── ui/
-│   │   ├── components/      # Shared React components
-│   │   ├── icons/           # Icon library
-│   │   └── utils/           # UI utilities
-│   ├── lib/
-│   │   ├── auth/            # Authentication library
-│   │   ├── database/        # Database utilities
-│   │   ├── logger/          # Logging utilities
-│   │   └── utils/           # Shared utilities
-│   └── config/
-│       ├── eslint/          # ESLint configurations
-│       ├── typescript/      # TypeScript configurations
-│       └── jest/            # Jest configurations
-├── tools/
-│   ├── database/            # Database scripts and migrations
-│   ├── scripts/             # Development scripts
-│   └── docker/              # Docker configurations
-└── docs/                    # Documentation
-```
+### Match Identification from Images
+Upload a screenshot of a football match and our AI will identify the teams and competition, allowing you to quickly find betting markets.
 
-## 🛠 Technology Stack
+### AI-Powered Probability Analysis
+Get intelligent insights on your selected betting markets with our Google Gemini integration, helping you make more informed betting decisions.
+
+### Multi-Chain Support
+Place bets on either Polygon or Moonbeam blockchains, taking advantage of:
+- Polygon's high transaction throughput and low gas fees
+- Moonbeam's integration with the Polkadot ecosystem
+
+### Cross-Platform Experience
+Access ChainBet from:
+- Web application (Next.js)
+- Mobile application (React Native/Expo)
+
+## 🛠️ Technology Stack
 
 ### Frontend
 - **Next.js 14** - React framework with App Router
 - **React Native** - Mobile app development with Expo
 - **TypeScript** - Type safety across all applications
 - **Tailwind CSS** - Utility-first CSS framework
-- **Radix UI** - Headless UI components
 
 ### Backend
-- **Fastify** - High-performance Node.js web framework
-- **MongoDB** - NoSQL database with migrate-mongo
-- **Redis** - In-memory data store for caching
-- **Elasticsearch** - Search and analytics engine
+- **Next.js API Routes** - Backend-for-Frontend (BFF) architecture
+- **MongoDB** - Primary database for match data and betting history
+- **Redis** - Caching and transient data storage
+- **Elasticsearch** - Advanced search functionality for matches
 
 ### Blockchain
+- **Polygon & Moonbeam** - EVM-compatible blockchains
 - **Hardhat** - Ethereum development environment
 - **Ethers.js** - Ethereum library
-- **OpenZeppelin** - Smart contract security
+- **Chainlink Functions** - Oracle for sports results
 
-### DevOps & Tools
-- **Turborepo** - Build system and monorepo tool
-- **Docker** - Containerization
-- **GitHub Actions** - CI/CD pipeline
-- **Playwright** - End-to-end testing
-- **Jest** - Unit testing framework
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
+## 🧪 Development
 
-## 🔧 Development
+### Running the Application
 
-### Prerequisites
-- Node.js 18+
-- pnpm 8+
-- Docker & Docker Compose
-- MongoDB (or use Docker)
+```bash
+# Start all services
+pnpm dev
 
-### Environment Setup
-
-1. **Install dependencies:**
-   ```bash
-   pnpm install
-   ```
-
-2. **Set up environment variables:**
-   ```bash
-   cp .env.example .env.local
-   ```
-
-3. **Start development services:**
-   ```bash
-   # Start all services
-   pnpm dev
-
-   # Start specific app
-   pnpm dev:web     # Next.js web app
-   pnpm dev:mobile  # React Native app
-   pnpm dev:api     # API server
-   pnpm dev:contracts # Hardhat node
-   ```
+# Start specific app
+pnpm dev:web     # Next.js web app
+pnpm dev:mobile  # React Native app
+```
 
 ### Database Setup
 
@@ -128,195 +93,46 @@ pnpm db:migrate
 pnpm db:seed
 ```
 
-### Building for Production
+### Smart Contract Development
 
 ```bash
-# Build all apps
-pnpm build
+# Start local blockchain
+pnpm dev:contracts
 
-# Build specific app
-pnpm build:web
-pnpm build:mobile
-pnpm build:api
-pnpm build:contracts
-```
+# Deploy contracts to local network
+pnpm deploy:local
 
-## 🧪 Testing
-
-### Unit Tests
-```bash
-# Run all tests
-pnpm test
-
-# Run tests for specific app
-pnpm test:web
-pnpm test:mobile
-pnpm test:api
+# Run contract tests
 pnpm test:contracts
-
-# Run tests in watch mode
-pnpm test:watch
 ```
 
-### Integration Tests
+## 📱 Mobile App
+
+The ChainBet mobile app provides the same core functionality as the web application, allowing users to:
+
+1. Search for matches
+2. Analyze betting markets with AI
+3. Place bets using their mobile wallet
+4. Track their betting history
+
+To run the mobile app in development:
+
 ```bash
-# Run API integration tests
-pnpm test:integration
-
-# Run end-to-end tests
-pnpm test:e2e
+pnpm dev:mobile
 ```
-
-### Test Coverage
-```bash
-# Generate coverage report
-pnpm test:coverage
-```
-
-## 🐳 Docker
-
-### Development Environment
-```bash
-# Start all services
-docker-compose -f docker-compose.dev.yml up
-
-# Start specific services
-docker-compose -f docker-compose.dev.yml up web api database
-```
-
-### Production Build
-```bash
-# Build production images
-docker-compose build
-
-# Start production environment
-docker-compose up
-```
-
-## 🚀 Deployment
-
-### Web App (Vercel)
-```bash
-# Deploy to Vercel
-vercel --prod
-```
-
-### Mobile App
-```bash
-# Build for iOS
-pnpm build:ios
-
-# Build for Android
-pnpm build:android
-
-# Submit to app stores
-pnpm submit:ios
-pnpm submit:android
-```
-
-### API Server
-```bash
-# Deploy to AWS/GCP/Azure
-pnpm deploy:api
-```
-
-### Smart Contracts
-```bash
-# Deploy to testnet
-pnpm deploy:testnet
-
-# Deploy to mainnet
-pnpm deploy:mainnet
-```
-
-## 📊 Monitoring & Observability
-
-### Application Monitoring
-- **Pino** - Structured logging
-- **OpenTelemetry** - Distributed tracing
-- **Prometheus** - Metrics collection
-- **Grafana** - Metrics visualization
-
-### Error Tracking
-- **Sentry** - Error monitoring and performance tracking
-
-### Performance Monitoring
-- **Lighthouse CI** - Web performance monitoring
-- **Bundle Analyzer** - Bundle size analysis
 
 ## 🔐 Security
 
-### Authentication
-- JWT-based authentication
-- Role-based access control (RBAC)
-- OAuth 2.0 integration
+ChainBet prioritizes security through:
 
-### Security Headers
-- CSRF protection
-- XSS protection
-- Content Security Policy (CSP)
-- HTTPS enforcement
-
-### Smart Contract Security
-- OpenZeppelin security standards
-- Slither static analysis
-- Mythril security scanning
-
-## 🧹 Code Quality
-
-### Linting & Formatting
-```bash
-# Lint all code
-pnpm lint
-
-# Fix linting issues
-pnpm lint:fix
-
-# Format code
-pnpm format
-```
-
-### Pre-commit Hooks
-- ESLint validation
-- TypeScript type checking
-- Prettier formatting
-- Commit message validation
-
-### Code Reviews
-- Automated PR checks
-- Required reviewers
-- Branch protection rules
-
-## 📚 Documentation
-
-### API Documentation
-- **Swagger/OpenAPI** - API documentation
-- **Storybook** - Component documentation
-
-### Code Documentation
-- **TSDoc** - TypeScript documentation
-- **Docusaurus** - Documentation site
+- Smart contract audits and best practices
+- Secure wallet integration
+- Trustless oracle implementation via Chainlink
+- Comprehensive testing across all components
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-### Commit Convention
-This project uses [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: add new feature
-fix: fix a bug
-docs: update documentation
-style: formatting changes
-refactor: code refactoring
-test: add or update tests
-chore: maintenance tasks
-```
+We welcome contributions to ChainBet! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines.
 
 ## 📄 License
 
@@ -324,33 +140,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- 📧 Email: support@yourcompany.com
-- 💬 Discord: [Join our community](https://discord.gg/yourserver)
-- 📖 Documentation: [docs.yourcompany.com](https://docs.yourcompany.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/yourcompany/todo-monorepo/issues)
-
-## 🙏 Acknowledgments
-
-This template is built on top of excellent open-source projects:
-- [Turborepo](https://turbo.build)
-- [Next.js](https://nextjs.org)
-- [React Native](https://reactnative.dev)
-- [Fastify](https://fastify.dev)
-- [Hardhat](https://hardhat.org)
-- [MongoDB](https://mongodb.com)
-- [Docker](https://docker.com)
-
-## 🗺 Roadmap
-
-- [ ] Add GraphQL API support
-- [ ] Implement real-time features with WebSockets
-- [ ] Add multi-tenant architecture
-- [ ] Implement serverless functions
-- [ ] Add advanced analytics
-- [ ] Implement progressive web app (PWA)
-- [ ] Add internationalization (i18n)
-- [ ] Implement advanced caching strategies
+- 📧 Email: support@chainbet.io
+- 💬 Discord: [Join our community](https://discord.gg/chainbet)
+- 🐛 Issues: [GitHub Issues](https://github.com/chainbet/chain-bet/issues)
 
 ---
 
-**Built with ❤️ by the development team**
+**Built with ❤️ by the ChainBet Team**
