@@ -1,6 +1,8 @@
 // FED1T2W_WebNavigation: Layout component with navigation
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { BetSlip } from './BetSlip';
+import WalletButton from './WalletButton';
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,9 +32,7 @@ export default function Layout({ children }: LayoutProps) {
               >
                 Profile
               </Link>
-              <div className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-                Connect Wallet
-              </div>
+              <WalletButton />
             </nav>
           </div>
         </div>
@@ -47,6 +47,7 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </footer>
+      <BetSlip />
     </div>
   );
 }
