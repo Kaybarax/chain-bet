@@ -35,7 +35,7 @@
     "@chainlink/contracts": "^0.8.0",
     "@openzeppelin/contracts": "^5.0.1",
     "@openzeppelin/contracts-upgradeable": "^5.0.1",
-    "dotenv": "^16.3.1"
+    "dotenv": "^17.2.0"
   },
   "devDependencies": {
     "@config/eslint": "workspace:*",
