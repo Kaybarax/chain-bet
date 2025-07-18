@@ -1,8 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local",
+    "docker-compose*.yml",
+    "Dockerfile*"
+  ],
   "globalEnv": [
     "NODE_ENV",
+    "PORT",
+    "HOST",
     "DATABASE_URL",
     "MONGODB_URI",
     "REDIS_URL",
@@ -12,13 +18,36 @@
     "PRIVATE_KEY",
     "ETHERSCAN_API_KEY",
     "GEMINI_API_KEY",
+    "GEMINI_BASE_URL",
     "CHROMATIC_PROJECT_TOKEN",
-    "SENTRY_DSN"
+    "SENTRY_DSN",
+    "INGESTION_BATCH_SIZE",
+    "INGESTION_INTERVAL_MS",
+    "INGESTION_RETRY_ATTEMPTS",
+    "INGESTION_RETRY_DELAY_MS",
+    "CI",
+    "VERCEL_URL",
+    "EXPO_TOKEN"
   ],
+  "remoteCache": {
+    "enabled": true
+  },
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**", "storybook-static/**"],
+      "dependsOn": [
+        "^build",
+        "type-check"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "build/**",
+        "storybook-static/**",
+        "artifacts/**",
+        "typechain-types/**",
+        "coverage/**"
+      ],
       "env": [
         "NODE_ENV",
         "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
@@ -26,7 +55,9 @@
         "DATABASE_URL",
         "MONGODB_URI",
         "REDIS_URL",
-        "ELASTICSEARCH_URL"
+        "ELASTICSEARCH_URL",
+        "PRIVATE_KEY",
+        "ETHERSCAN_API_KEY"
       ]
     },
     "dev": {
@@ -42,21 +73,54 @@
         "ELASTICSEARCH_URL"
       ]
     },
+    "start": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "preview": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
     "lint": {
-      "dependsOn": ["^lint"],
-      "outputs": [".eslintcache"]
+      "dependsOn": [
+        "^lint"
+      ],
+      "outputs": [
+        ".eslintcache"
+      ]
     },
     "lint:fix": {
-      "dependsOn": ["^lint:fix"],
-      "outputs": [".eslintcache"]
+      "dependsOn": [
+        "^lint:fix"
+      ],
+      "outputs": [
+        ".eslintcache"
+      ]
     },
     "type-check": {
-      "dependsOn": ["^type-check"],
-      "outputs": ["tsconfig.tsbuildinfo"]
+      "dependsOn": [
+        "^type-check"
+      ],
+      "outputs": [
+        "tsconfig.tsbuildinfo",
+        "*.tsbuildinfo"
+      ]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
+      "dependsOn": [
+        "^build",
+        "type-check"
+      ],
+      "outputs": [
+        "coverage/**",
+        "test-results/**"
+      ],
       "env": [
         "NODE_ENV",
         "DATABASE_URL",
@@ -76,9 +140,47 @@
         "ELASTICSEARCH_URL"
       ]
     },
+    "test:coverage": {
+      "dependsOn": [
+        "^build",
+        "type-check"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL"
+      ]
+    },
+    "test:integration": {
+      "dependsOn": [
+        "^build",
+        "type-check"
+      ],
+      "outputs": [
+        "test-results/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "MONGODB_URI",
+        "REDIS_URL",
+        "ELASTICSEARCH_URL"
+      ]
+    },
     "test:e2e": {
-      "dependsOn": ["^build"],
-      "outputs": ["playwright-report/**", "test-results/**"],
+      "dependsOn": [
+        "^build",
+        "type-check"
+      ],
+      "outputs": [
+        "playwright-report/**",
+        "test-results/**"
+      ],
       "env": [
         "NODE_ENV",
         "DATABASE_URL",
@@ -93,11 +195,19 @@
       "cache": false
     },
     "contracts:compile": {
-      "dependsOn": ["^contracts:compile"],
-      "outputs": ["artifacts/**", "cache/**", "typechain/**"]
+      "dependsOn": [
+        "^contracts:compile"
+      ],
+      "outputs": [
+        "artifacts/**",
+        "cache/**",
+        "typechain-types/**"
+      ]
     },
     "contracts:deploy": {
-      "dependsOn": ["contracts:compile"],
+      "dependsOn": [
+        "contracts:compile"
+      ],
       "env": [
         "PRIVATE_KEY",
         "ETHERSCAN_API_KEY",
@@ -105,10 +215,23 @@
       ]
     },
     "contracts:verify": {
-      "dependsOn": ["contracts:deploy"],
+      "dependsOn": [
+        "contracts:deploy"
+      ],
       "env": [
         "ETHERSCAN_API_KEY",
         "NEXT_PUBLIC_CHAIN_ID"
+      ]
+    },
+    "contracts:test": {
+      "dependsOn": [
+        "contracts:compile"
+      ],
+      "outputs": [
+        "coverage/**"
+      ],
+      "env": [
+        "REPORT_GAS"
       ]
     },
     "storybook": {
@@ -120,8 +243,13 @@
       ]
     },
     "storybook:build": {
-      "dependsOn": ["^build"],
-      "outputs": ["storybook-static/**"],
+      "dependsOn": [
+        "^build",
+        "type-check"
+      ],
+      "outputs": [
+        "storybook-static/**"
+      ],
       "env": [
         "NODE_ENV",
         "CHROMATIC_PROJECT_TOKEN"
@@ -132,11 +260,65 @@
       "persistent": true
     },
     "docs:build": {
-      "dependsOn": ["^docs:build"],
-      "outputs": ["build/**", ".docusaurus/**"]
+      "dependsOn": [
+        "^docs:build"
+      ],
+      "outputs": [
+        "build/**",
+        ".docusaurus/**"
+      ]
+    },
+    "db:migrate": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "MONGODB_URI"
+      ]
+    },
+    "db:seed": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "MONGODB_URI"
+      ]
+    },
+    "db:reset": {
+      "cache": false,
+      "env": [
+        "DATABASE_URL",
+        "MONGODB_URI"
+      ]
+    },
+    "docker:build": {
+      "cache": false,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "docker:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "docker:test": {
+      "cache": false,
+      "dependsOn": [
+        "test"
+      ]
+    },
+    "deploy": {
+      "dependsOn": [
+        "build",
+        "test",
+        "lint",
+        "type-check"
+      ],
+      "env": [
+        "NODE_ENV",
+        "VERCEL_URL",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "PRIVATE_KEY"
+      ]
     }
-  },
-  "remoteCache": {
-    "enabled": true
   }
 }

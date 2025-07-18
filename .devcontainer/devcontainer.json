@@ -1,24 +1,15 @@
 {
   "name": "ChainBet Development Environment",
-  "dockerComposeFile": "../docker-compose.dev.yml",
-  "service": "web",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
   "workspaceFolder": "/app",
-  "shutdownAction": "stopCompose",
   
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "18.18.0",
-      "nodeGypDependencies": true
-    },
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "version": "latest",
-      "dockerDashComposeVersion": "v2"
-    },
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-      "version": "latest"
+      "enableNonRootDocker": "true"
     }
   },
 
@@ -75,6 +66,10 @@
     }
   },
 
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind,consistency=cached"
+  ],
+
   "forwardPorts": [3000, 3001, 3002, 3003, 6379, 9200, 9090, 27017],
   "portsAttributes": {
     "3000": {
@@ -112,13 +107,18 @@
   },
 
   "postCreateCommand": "pnpm install && pnpm build",
-  "postStartCommand": "pnpm db:migrate && pnpm db:seed",
+  "postStartCommand": "chmod +x .devcontainer/start-dev.sh && .devcontainer/start-dev.sh",
 
   "remoteUser": "node",
   "remoteEnv": {
     "NODE_ENV": "development",
-    "DATABASE_URL": "mongodb://admin:password@mongodb:27017/chainbet?authSource=admin",
-    "REDIS_URL": "redis://redis:6379",
-    "ELASTICSEARCH_URL": "http://elasticsearch:9200"
-  }
+    "DATABASE_URL": "mongodb://admin:password@localhost:27017/chainbet?authSource=admin",
+    "REDIS_URL": "redis://localhost:6379",
+    "ELASTICSEARCH_URL": "http://localhost:9200"
+  },
+
+  "initializeCommand": "echo 'Starting ChainBet Development Environment...'",
+  "onCreateCommand": "echo 'DevContainer created successfully!'",
+  "updateContentCommand": "pnpm install",
+  "postAttachCommand": "echo 'Welcome to ChainBet Development Environment! 🚀'"
 }

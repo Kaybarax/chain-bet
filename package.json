@@ -1,8 +1,8 @@
 {
-  "name": "todo-monorepo",
+  "name": "chain-bet-monorepo",
   "private": true,
   "version": "1.0.0",
-  "description": "Enterprise-grade TODO monorepo with Turborepo, Docker, and modern DevOps practices",
+  "description": "Enterprise-grade monorepo with Turborepo, Docker, and modern DevOps practices",
   "author": "ChainBet Team",
   "license": "MIT",
   "packageManager": "pnpm@9.0.0",
@@ -13,11 +13,15 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "start": "turbo start",
+    "preview": "turbo preview",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
     "type-check": "turbo type-check",
     "test": "turbo test",
     "test:watch": "turbo test:watch",
+    "test:coverage": "turbo test:coverage",
+    "test:integration": "turbo test:integration",
     "test:e2e": "turbo test:e2e",
     "clean": "turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
@@ -26,18 +30,38 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish",
+    "docker:build": "turbo docker:build",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up",
     "docker:test": "docker-compose -f docker-compose.test.yml up --build",
     "docker:down": "docker-compose -f docker-compose.dev.yml down && docker-compose -f docker-compose.test.yml down",
-    "db:migrate": "tsx scripts/migrate.ts",
-    "db:seed": "tsx scripts/seed.ts",
-    "db:reset": "tsx scripts/reset.ts",
+    "docker:clean": "docker system prune -f && docker volume prune -f",
+    "db:migrate": "turbo db:migrate",
+    "db:seed": "turbo db:seed",
+    "db:reset": "turbo db:reset",
+    "contracts:compile": "turbo contracts:compile",
     "contracts:deploy": "turbo contracts:deploy",
     "contracts:verify": "turbo contracts:verify",
+    "contracts:test": "turbo contracts:test",
     "storybook": "turbo storybook",
     "storybook:build": "turbo storybook:build",
     "docs:dev": "turbo docs:dev",
-    "docs:build": "turbo docs:build"
+    "docs:build": "turbo docs:build",
+    "deploy": "turbo deploy",
+    "dev:web": "turbo dev --filter=web",
+    "dev:api": "turbo dev --filter=api",
+    "dev:mobile": "turbo dev --filter=mobile",
+    "dev:contracts": "turbo dev --filter=contracts",
+    "dev:ingestion": "turbo dev --filter=ingestion",
+    "build:web": "turbo build --filter=web",
+    "build:api": "turbo build --filter=api",
+    "build:mobile": "turbo build --filter=mobile",
+    "build:contracts": "turbo build --filter=contracts",
+    "build:ingestion": "turbo build --filter=ingestion",
+    "test:web": "turbo test --filter=web",
+    "test:api": "turbo test --filter=api",
+    "test:contracts": "turbo test --filter=contracts",
+    "bootstrap": "pnpm install && pnpm build",
+    "reset-all": "pnpm clean && pnpm docker:clean && pnpm db:reset && pnpm bootstrap"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
@@ -48,7 +72,7 @@
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
     "tsx": "^4.7.0",
-    "turbo": "^1.11.2",
+    "turbo": "^2.5.5",
     "typescript": "^5.3.3"
   },
   "workspaces": [
@@ -69,5 +93,10 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "dependencies": {
+    "autoprefixer": "10.4.16",
+    "postcss": "8.4.32",
+    "tailwindcss": "3.3.6"
   }
 }

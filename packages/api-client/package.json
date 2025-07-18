@@ -1,0 +1,22 @@
+{
+  "name": "@chainbet/api-client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@config/eslint": "workspace:*",
+    "@config/typescript": "workspace:*",
+    "typescript": "^5.3.3"
+  }
+}

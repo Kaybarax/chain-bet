@@ -4,22 +4,35 @@
   "private": true,
   "scripts": {
     "build": "hardhat compile",
+    "dev": "hardhat node",
     "test": "hardhat test",
     "test:coverage": "hardhat coverage",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:testnet": "hardhat run scripts/deploy.ts --network testnet",
     "deploy:mainnet": "hardhat run scripts/deploy.ts --network mainnet",
     "node": "hardhat node",
+    "node:fork": "hardhat node --fork https://eth-mainnet.g.alchemy.com/v2/your-api-key",
     "verify": "hardhat verify",
+    "verify:testnet": "hardhat verify --network testnet",
+    "verify:mainnet": "hardhat verify --network mainnet",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "type-check": "tsc --noEmit",
+    "clean": "hardhat clean && rm -rf typechain-types && rm -rf artifacts && rm -rf cache",
     "flatten": "hardhat flatten",
-    "gas-report": "REPORT_GAS=true hardhat test"
+    "size": "hardhat size-contracts",
+    "docgen": "hardhat docgen",
+    "console": "hardhat console",
+    "accounts": "hardhat accounts",
+    "balance": "hardhat balance",
+    "send": "hardhat send",
+    "generate": "hardhat generate",
+    "account": "hardhat account"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.8.0",
-    "@lib/utils": "workspace:*",
     "@openzeppelin/contracts": "^5.0.1",
     "@openzeppelin/contracts-upgradeable": "^5.0.1",
     "dotenv": "^16.3.1"
@@ -39,11 +52,25 @@
     "@types/node": "^20.10.4",
     "chai": "^4.3.10",
     "ethers": "^6.9.0",
-    "hardhat": "^2.19.2",
+    "hardhat": "^2.26.0",
+    "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-docgen": "^1.3.0",
     "hardhat-gas-reporter": "^1.0.9",
     "solidity-coverage": "^0.8.5",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
     "typescript": "^5.3.3"
-  }
+  },
+  "keywords": [
+    "blockchain",
+    "smart-contracts",
+    "ethereum",
+    "solidity",
+    "hardhat",
+    "defi",
+    "betting"
+  ],
+  "description": "Smart contracts for ChainBet decentralized betting platform",
+  "author": "ChainBet Team",
+  "license": "MIT"
 }

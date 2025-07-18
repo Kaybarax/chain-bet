@@ -1,26 +1,29 @@
-# TODO Monorepo Template
+# ChainBet - Decentralized Football Betting Platform
 
-A comprehensive, production-ready monorepo template built with Turborepo that incorporates enterprise-grade DevOps practices and modern development tooling. This template provides a solid foundation for building scalable applications with Next.js, React Native, Node.js APIs, and Ethereum smart contracts.
+> **A comprehensive monorepo for building decentralized betting applications with modern DevOps practices**
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Node.js 18+
+- pnpm 8+
+- Docker & Docker Compose
+- Git
+
+### Setup
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd todo-monorepo
+git clone <repository-url>
+cd chain-bet
 
-# Install dependencies
-pnpm install
-
-# Set up environment variables
-cp .env.example .env.local
+# Run the setup script
+./scripts/setup.sh
 
 # Start development environment
 pnpm dev
-
-# Or start with Docker
-docker-compose -f docker-compose.dev.yml up
 ```
+
+Visit [http://localhost:3000](http://localhost:3000) to see the web application.
 
 ## 📁 Project Structure
 
